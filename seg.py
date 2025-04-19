@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import json
 
 import cv2
 import numpy as np
@@ -151,11 +152,15 @@ def main(args):
 
     model.eval()
 
-    while True:
+    root_path = '/root/data/'
+    data = json.load(open('root/data/output.json'))
+    for example in data:
+        image_path = root_path + example['image_path']
         conv = conversation_lib.conv_templates[args.conv_type].copy()
         conv.messages = []
 
-        prompt = input("Please input your prompt: ")
+        # prompt = input("Please input your prompt: ")
+        prompt = "Segment the main character in the image. Focus on the most visually prominent person or object that draws attention. "
         prompt = DEFAULT_IMAGE_TOKEN + "\n" + prompt
         if args.use_mm_start_end:
             replace_token = (
@@ -167,7 +172,8 @@ def main(args):
         conv.append_message(conv.roles[1], "")
         prompt = conv.get_prompt()
 
-        image_path = input("Please input the image path: ")
+        # image_path = input("Please input the image path: ")
+        
         if not os.path.exists(image_path):
             print("File not found in {}".format(image_path))
             continue
