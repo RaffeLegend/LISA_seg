@@ -152,8 +152,8 @@ def main(args):
 
     model.eval()
 
-    root_path = '/root/data/'
-    data = json.load(open('root/data/output.json'))
+    root_path = '/mnt/data1/users/yiwei/data/origin/'
+    data = json.load(open('/mnt/data1/users/yiwei/projects/raffe_tools/fake_news/output.json'))
     for example in data:
         image_path = root_path + example['image_path']
         conv = conversation_lib.conv_templates[args.conv_type].copy()
