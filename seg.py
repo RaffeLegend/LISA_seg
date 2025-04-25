@@ -240,7 +240,7 @@ def main(args):
             pred_mask = pred_mask > 0
 
 
-            filename_wo_ext = os.path.splitext(example[image_path])[0]
+            filename_wo_ext = os.path.splitext(example['image_path'])[0]
             save_path = os.path.join(args.vis_save_path, f"{filename_wo_ext}_mask_{i}.jpg")
 
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -250,7 +250,7 @@ def main(args):
             cv2.imwrite(save_path, pred_mask * 100)
             print("{} has been saved.".format(save_path))
 
-            save_path = "{}/{}_masked_img_{}.jpg".format(
+            save_path_1 = "{}/{}_masked_img_{}.jpg".format(
                 args.vis_save_path, image_path.split("/")[-1].split(".")[0], i
             )
             save_img = image_np.copy()
@@ -259,8 +259,13 @@ def main(args):
                 + pred_mask[:, :, None].astype(np.uint8) * np.array([255, 0, 0]) * 0.5
             )[pred_mask]
             save_img = cv2.cvtColor(save_img, cv2.COLOR_RGB2BGR)
-            cv2.imwrite(save_path, save_img)
+            cv2.imwrite(save_path_1, save_img)
             print("{} has been saved.".format(save_path))
+
+            example['mask'] = os.path.join(os.path.dirname(example['image_path']), os.path.basename(save_path))
+            # Write filtered JSON data to the output file
+            with open(args.json_path, 'w', encoding='utf-8') as outfile:
+                json.dump(example, outfile, indent=4, ensure_ascii=False)
 
 
 if __name__ == "__main__":
