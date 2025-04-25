@@ -44,6 +44,10 @@ def parse_args(args):
         type=str,
         choices=["llava_v1", "llava_llama_2"],
     )
+
+    # Add arguments for image processing
+    parser.add_argument("--json_path", type=str, help="Path to the input image")
+    parser.add_argument("--image_path", type=str, help="Path to the input image", default=None)
     return parser.parse_args(args)
 
 
@@ -152,10 +156,9 @@ def main(args):
 
     model.eval()
 
-    root_path = '/mnt/data1/users/yiwei/data/origin/'
-    data = json.load(open('/mnt/data1/users/yiwei/projects/raffe_tools/fake_news/output.json'))
+    data = json.load(open(args.json_path, "r"))
     for example in data:
-        image_path = root_path + example['image_path']
+        image_path = args.image_path + example['image_path']
         conv = conversation_lib.conv_templates[args.conv_type].copy()
         conv.messages = []
 
@@ -236,9 +239,14 @@ def main(args):
             pred_mask = pred_mask.detach().cpu().numpy()[0]
             pred_mask = pred_mask > 0
 
-            save_path = "{}/{}_mask_{}.jpg".format(
-                args.vis_save_path, image_path.split("/")[-1].split(".")[0], i
-            )
+
+            filename_wo_ext = os.path.splitext(example[image_path])[0]
+            save_path = os.path.join(args.vis_save_path, f"{filename_wo_ext}_mask_{i}.jpg")
+
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            # save_path = "{}/{}_mask_{}.jpg".format(
+            #     args.vis_save_path, image_path.split("/")[-1].split(".")[0], i
+            # )
             cv2.imwrite(save_path, pred_mask * 100)
             print("{} has been saved.".format(save_path))
 
