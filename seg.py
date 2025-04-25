@@ -157,6 +157,8 @@ def main(args):
     model.eval()
 
     data = json.load(open(args.json_path, "r"))
+
+    output = []
     for example in data:
         image_path = args.image_path + example['image_path']
         conv = conversation_lib.conv_templates[args.conv_type].copy()
@@ -263,9 +265,10 @@ def main(args):
             print("{} has been saved.".format(save_path))
 
             example['mask'] = os.path.join(os.path.dirname(example['image_path']), os.path.basename(save_path))
+            output.append(example)
             # Write filtered JSON data to the output file
             with open(args.json_path, 'w', encoding='utf-8') as outfile:
-                json.dump(example, outfile, indent=4, ensure_ascii=False)
+                json.dump(output, outfile, indent=4, ensure_ascii=False)
 
 
 if __name__ == "__main__":
